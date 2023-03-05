@@ -117,3 +117,39 @@ async fn subscribe_returns_a_400_when_data_is_missing(pool: PgPool) -> sqlx::Res
 
     Ok(())
 }
+
+#[sqlx::test]
+async fn subscribe_returns_a_200_when_fields_are_present_but_empty(
+    pool: PgPool,
+) -> sqlx::Result<()> {
+    // Arrange
+    let app = spawn_app(&pool).await;
+    let client = reqwest::Client::new();
+
+    // Act
+    let test_cases = vec![
+        ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+        ("name=Ursula&email=", "empty email"),
+        ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+    ];
+
+    for (invalid_body, error_message) in test_cases {
+        let response = client
+            .post(&format!("{}/subscriptions", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(invalid_body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API did not fail with 400 OK when the payload was {}.",
+            error_message
+        );
+    }
+
+    Ok(())
+}

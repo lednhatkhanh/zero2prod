@@ -1,0 +1,9 @@
+target
+tests
+.vscode
+deny.toml
+.github
+scripts
+migrations
+.env
+Dockerfile
