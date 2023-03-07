@@ -6,7 +6,7 @@ use crate::domain::SubscriberEmail;
 pub struct EmailClient {
     http_client: Client,
     sender: SubscriberEmail,
-    base_url: reqwest::Url,
+    base_url: String,
     authorization_token: Secret<String>,
 }
 
@@ -22,7 +22,7 @@ struct SendEmailRequest<'a> {
 
 impl EmailClient {
     pub fn new(
-        base_url: reqwest::Url,
+        base_url: String,
         sender: SubscriberEmail,
         authorization_token: Secret<String>,
         timeout: std::time::Duration,
@@ -44,7 +44,7 @@ impl EmailClient {
         html_content: &str,
         text_content: &str,
     ) -> Result<(), reqwest::Error> {
-        let url = reqwest::Url::join(&self.base_url, "/email").unwrap();
+        let url = format!("{}/email", self.base_url);
         let request_body = SendEmailRequest {
             from: self.sender.as_ref(),
             to: recipient.as_ref(),

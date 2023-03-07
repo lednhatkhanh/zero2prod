@@ -30,6 +30,7 @@ pub struct ApplicationSettings {
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
+    pub base_url: String,
 }
 
 impl DatabaseSettings {
@@ -113,7 +114,7 @@ impl Environment {
 
 #[derive(serde::Deserialize, Clone)]
 pub struct EmailClientSettings {
-    base_url: String,
+    pub base_url: String,
     pub sender_email: String,
     pub authorization_token: Secret<String>,
     pub timeout_milliseconds: u64,
@@ -126,9 +127,5 @@ impl EmailClientSettings {
 
     pub fn timeout(&self) -> std::time::Duration {
         std::time::Duration::from_millis(self.timeout_milliseconds)
-    }
-
-    pub fn base_url(&self) -> reqwest::Url {
-        self.base_url.parse().unwrap()
     }
 }
